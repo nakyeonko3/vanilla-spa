@@ -6,15 +6,50 @@
 
 ## 준비물
 - spa로 작성된 토이프로젝트 인트라넷 웹앱
-- Gihub Repository 2개가 필요함. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
+- Gihub Repository 2개가 필요함. 베포용과 개발용 리포 두개. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
 - 개인적으로는 팀 organization을 하나 더 만들고 그걸 배포 리포지토리로 쓰는 걸 추천드림. [Github Organization 만들기 링크](https://velog.io/@gmlstjq123/Github-Organization-%EB%A7%8C%EB%93%A4%EA%B8%B0)
 - 깃허브 인증 토큰.(인증 토큰 발급 방법도 설명함.)
 
 
 ## 지금 리포지토리는 참고용으로 쓰시면 됩니다. 
 배포를 설명하기 위해서 다시 한번 배포를 예시 프로젝트를 만들었음.
-일단 참고로 쓸 프로젝트의 폴더 구조도임. server/index.js 안에 express 서버 코드가 들어 있음.
-![](https://i.imgur.com/fxcMgPq.png)
+
+- 폴더 구조도
+```
+vanilla-spa
+├─ .prettierrc
+├─ image.png
+├─ index.html
+├─ LICENSE
+├─ package-lock.json
+├─ package.json
+├─ preview.jpg
+├─ public
+│  └─ _redirects
+├─ README.md
+├─ server
+│  └─ index.js
+└─ src
+   ├─ css
+   │  └─ style.css
+   └─ js
+      ├─ components
+      │  └─ counter.js
+      ├─ main.js
+      └─ views
+         ├─ about.js
+         ├─ contact.js
+         └─ home.js
+
+```
+
+
+- 개발용 리포 주소
+[GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
+
+- 배포용 리포
+[GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
+
 
 
 ## `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
@@ -147,4 +182,3 @@ container.innerHTML = /* HTML */ `
 
 - 아래의 권한을 체크하고 토큰을 발급받고 , 토큰값을 복사해서 어딘가에 저장하면 토큰 발급 완료!
  ![](https://i.imgur.com/BC2296D.png)
-![alt text](image.png)
