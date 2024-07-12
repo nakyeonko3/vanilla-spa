@@ -14,8 +14,8 @@
 
 ## 준비물
 - spa로 작성된 토이프로젝트 인트라넷 웹앱
-- Gihub Repository 2개가 필요함. 베포용과 개발용 리포 두개. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
-- 개인적으로는 팀 organization을 하나 더 만들고 그걸 배포 리포지토리로 쓰는 걸 추천드림. [Github Organization 만들기 링크](https://velog.io/@gmlstjq123/Github-Organization-%EB%A7%8C%EB%93%A4%EA%B8%B0)
+- Gihub Repository 2개가 필요함. `베포용`과 `개발용` 리포 두개. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
+- 개인적으로는 팀 organization을 하나 더 만들고 그걸 배포 리포지토리로 쓰는 걸 추천드림.
 - 깃허브 인증 토큰.(인증 토큰 발급 방법도 설명함.)
 
 
@@ -180,3 +180,87 @@ container.innerHTML = /* HTML */ `
 
 - 아래의 권한을 체크하고 토큰을 발급받고 , 토큰값을 복사해서 어딘가에 저장하면 토큰 발급 완료!
  ![](https://i.imgur.com/BC2296D.png)
+
+
+## Github action 설정하기 
+아래의 설정 파일을 일단 복사하기
+
+
+
+###  `build.sh` 파일 생성하기
+
+프로젝트 폴더 루트 경로에 `/build.sh` 를 생성해서 저장하기
+
+```shell
+#!/bin/sh
+cd ../
+mkdir output
+cp -R ./[team-repo-name]/* ./output
+cp -R ./output ./[team-repo-name]/
+```
+### 개발용 secret 시크릿 변수 등록
+
+이제 개발자 리포에서 시크릿 변수를 등록시킨다. 
+settings 탭으로 이동 한다음 screts and variables를 클릭한 다음 repository secrets에서 
+
+`AUTO_` 와 `OFFOCAL_ACCOUNT_EMAIL` 라는 변수를 만들어야한다.
+`AUTO_` 라는 변수에는 아까 발급 받은 `ghp_`로 시작하는 유저 깃허브 토큰을 등록한다.
+`OFFOCAL_ACCOUNT_EMAIL` 에는 깃헙에 등록된 내 email을 넣어주면된다.
+
+![](https://i.imgur.com/42yKWau.png)
+![](https://i.imgur.com/E4v3QxA.png)
+
+
+
+### GitHub Actions 활성화 & 워크플로우 생성
+일단 개발용 리포지토리에서 action 에서 setup yourself를 클릭
+![](https://i.imgur.com/UR4Bo7k.png)
+
+
+
+
+아래`destination-github-username`과 `destination-repository-name`를 편집하고 등록하면 된다.
+  현재 리포가 배포 레포지토리 소유자의 username과 repo 이름을 적어준다.
+소유자가 자기 자신이면 username을 넣으면 된다. repo에는 말그대로 배포용 리포지토리 이름을 넣어 주면 된다.
+
+```yaml
+name: git push into another repo to deploy to vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pandoc/latex
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install mustache (to update the date)
+        run: apk add ruby && gem install mustache
+      - name: creates output
+        run: sh ./build.sh
+      - name: Pushes to another repository
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.AUTO_ }}
+        with:
+          source-directory: 'output'
+          destination-github-username: [your-repo-github-username]
+          destination-repository-name: [your-repo-name]
+          user-email: ${{ secrets.OFFICIAL_ACCOUNT_EMAIL }}
+          commit-message: ${{ github.event.commits[0].message }}
+          target-branch: main
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
+```
+
+나는 아래처럼 수정하였다.
+![](https://i.imgur.com/6yqju4L.png)
+
+
+
+
+
+
