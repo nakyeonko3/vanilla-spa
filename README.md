@@ -2,6 +2,14 @@
 
 - 일단 어떻게 배포를 했는지 how to 위주로 정리함.
 - 현재 리포지토리를 다른 리포지토리로 연결해서 배포하도록 설정해두었으니 이 프로젝트 코드를 참고해도됨.
+- 개발용이 우리가 편집하는 코드가 저장되는 리포지토리고, 배포용이 말그대로 배포용도로만 쓰는 리포지토리임.
+
+- 개발용 리포 주소
+[GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
+
+- 배포용 리포
+[GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
+
 
 
 ## 준비물
@@ -42,15 +50,6 @@ vanilla-spa
          └─ home.js
 
 ```
-
-
-- 개발용 리포 주소
-[GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
-
-- 배포용 리포
-[GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
-
-
 
 ## `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
 
