@@ -177,7 +177,6 @@ container.innerHTML = /* HTML */ `
  ![](https://i.imgur.com/ngX5NA9.png)
 
 - Personal access tokens 클릭 -> tokens classic 클릭 -> generate new token classic
- ![](https://i.imgur.com/cZdRw85.png)
 ![](https://i.imgur.com/vAN8GdG.png)
 
 - 아래의 권한을 체크하고 토큰을 발급받고 , 토큰값을 복사해서 어딘가에 저장하면 토큰 발급 완료!
