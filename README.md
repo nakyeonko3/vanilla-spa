@@ -263,8 +263,6 @@ jobs:
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
 ```
-
-나는 아래처럼 수정하였다.
 ![](https://i.imgur.com/6yqju4L.png)
 
 
