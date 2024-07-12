@@ -189,8 +189,10 @@ container.innerHTML = /* HTML */ `
 
 ###  `build.sh` 파일 생성하기
 
-프로젝트 폴더 루트 경로에 `/build.sh` 를 생성해서 저장하기
 
+개발 리포의 루트 경로에 `build.sh` 를 생성해서 저장하기
+
+이걸 그대로 그대로 쓰면 안되고 현재 `[team-repo-name]`에 개발 리포지토리명을 적으면됨.
 ```shell
 #!/bin/sh
 cd ../
@@ -198,10 +200,16 @@ mkdir output
 cp -R ./[team-repo-name]/* ./output
 cp -R ./output ./[team-repo-name]/
 ```
-### 개발용 secret 시크릿 변수 등록
 
-이제 개발자 리포에서 시크릿 변수를 등록시킨다. 
-settings 탭으로 이동 한다음 screts and variables를 클릭한 다음 repository secrets에서 
+요런식으로 적으면됨.
+![](https://i.imgur.com/QksE49O.png)
+
+
+### secret 시크릿 변수 등록
+
+이제 `개발 리포`에서 시크릿 변수를 등록시킨다. 
+
+깃허브 리포지토리에 메뉴들중에서 settings 탭으로 이동 한다음 screts and variables를 클릭한다. 그리고 repository secrets에서 시크릿 키값을 저장할 수 있다.
 
 `AUTO_` 와 `OFFOCAL_ACCOUNT_EMAIL` 라는 변수를 만들어야한다.
 `AUTO_` 라는 변수에는 아까 발급 받은 `ghp_`로 시작하는 유저 깃허브 토큰을 등록한다.
