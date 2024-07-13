@@ -1,7 +1,13 @@
 # SPA앱 배포하기
 
 - 일단 어떻게 배포를 했는지 how to 위주로 정리함.
+- 나름 개발 동시에 배포가 빠르게 이루어지는 CI/CD를 구축하는 것이 목적임.
 - 현재 리포지토리를 다른 리포지토리로 연결해서 배포하도록 설정해두었으니 이 프로젝트 코드를 참고해도됨.
+- 일반적인 방법으로 owner권한이 없는 리포지토리를 배포할 수 있는 방법은 없기 때문에 복사한 리포를 배포하는 특이한 방법을 씀.
+
+## 유의 사항
+
+- 아래서 설명할 때 `개발용 리포`와 `배포용 리포`라는 용어를 쓸 것임.
 - 개발용이 우리가 편집하는 코드가 저장되는 리포지토리고, 배포용이 말그대로 배포용도로만 쓰는 리포지토리임.
 
 - 개발용 리포 주소
@@ -9,6 +15,9 @@
 
 - 배포용 리포
   [GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
+
+- **작성할 스크립트를 작성 할 때는 오타나 띄어 쓰기를 유의해서 작성해야함.**
+- 스크립트를 그대로 복사해서 쓰는 것이 아니라 배포하려는 리포지토리와 깃허브 유저네임 등에 맞게 **수정한 다음 사용해야함.**
 
 ## 준비물
 
@@ -51,7 +60,7 @@ vanilla-spa
 
 ```
 
-## `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
+## 1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
 
 현재 프로젝트에`connect-history-api-fallback npm`종속성을 설치해준다.
 
@@ -119,7 +128,7 @@ app.get('/api/employees/:id', (req, res) => {
 
 서버에 오는 모든 API 요청을 전부다 정적 파일을 전달하는 주소`/index.html`로 바뀌어 버리기 때문에 위의 코드에서 `/api` 경로로 오는 서버 요청은 바뀌게 하지 않도록 설정을 해두었음.
 
-## 배포 환경 미리 테스트 해보기
+## 2. 배포 환경 미리 테스트 해보기
 
 로컬에서는 잘동작하다가 배포 환경에서는 가끔씩 이미지가 안나온다거나 로직이 문제가 생기는 경우가 빈번히 생김.
 
@@ -170,6 +179,12 @@ container.innerHTML = /* HTML */ `
 `;
 ```
 
+
+
+## 3. Github action 설정해서 `개발용 리포`와 `배포용 리포`를 동기화 시키기
+
+
+
 ## 유저 깃허브 인증 토큰 발급하기
 
 - 깃허브 홈화면 -> settings -> Developer settings 로 차례로 이동
@@ -182,13 +197,10 @@ container.innerHTML = /* HTML */ `
 - 아래의 권한을 체크하고 토큰을 발급받고 , 토큰값을 복사해서 어딘가에 저장하면 토큰 발급 완료!
   ![](https://i.imgur.com/BC2296D.png)
 
-## Github action 설정하기
-
 아래의 설정 파일을 일단 복사하기
 
 ### `build.sh` 파일 생성하기
 
-개발 리포의 루트 경로에 `build.sh` 를 생성해서 저장하기
 
 이걸 그대로 그대로 쓰면 안되고 현재 `[team-repo-name]`에 개발 리포지토리명을 적으면됨.
 
@@ -259,3 +271,56 @@ jobs:
 ```
 
 ![](https://i.imgur.com/6yqju4L.png)
+
+
+### 커밋 누르고 동기화 확인하기
+
+한 번 커밋을 누르고 배포용 리포와 개발용 리포가 방금 작성한 yml파일을 제외하고 동기화가 되고 있는 것을 확인하면 됨.
+
+이렇게 동기화가 되고 있으면 성공
+![](https://i.imgur.com/ZSOFigD.png)
+
+
+## 4. `배포용 리포지토리`를 웹 배포 서비스 사이트에 등록하기
+
+일단은 render가 무료고 추가 비용청구가 될 일이 없어서 render를 쓸 것임.
+다만, 콜드 스타트 이슈 때문에 가능하면 다른 배포 사이트를 사용하는 것도 좋음.
+render 대신에 koyeb나 railway를 배포해도 괜찮음. 배포 방법은 동일함.
+vercel은 안됨.
+
+이 링크를 참고해서 이 중에 하나를 고르면 됨.
+https://github.com/DmitryScaletta/free-heroku-alternatives?tab=readme-ov-file
+
+### render 에 배포 리포지토리를 등록하기
+render 가입하는 방법은 생략함.
+데시보드 화면 또는 위의 메뉴에 new를 클릭.
+거기서 web service를 클릭
+
+![](https://i.imgur.com/S72R8GI.png)
+
+
+그러면 이런 화면에 나오는데 `배포 리포지토리`가 있는 organization을 클릭하거나,
+Public Git Repository를 선택해서 `배포 리포지토리`를 등록하면됨.
+
+![](https://i.imgur.com/2Z6yfYZ.png)
+![](https://i.imgur.com/WjNCDs7.png)
+
+그리고 아래처럼 등록 region을 싱가포르로 바꾸고.
+instance Type을 free를 선택하고,
+deploy web service를 누르면 끝
+
+![](https://i.imgur.com/wTtS9Xb.png)
+
+
+
+### 배포 완료
+
+이제 해당 사이트에서 빌드가 다 되었다는 메시지가 로그창에 뜨고 배포 링크에 들어가면 우리의 웹사이트가 잘 배포가 되고 있음.
+
+이제는 `개발 리포`에서 main에 커밋을 할 때 변경한 사항이 배포 사이트에서 해당 변경 내역에 대한 것을 반영하고 재빌드하게 될 것임.
+![](https://i.imgur.com/b5a6vuU.png)
+
+### 선택) 환경 변수 등록
+외부 API를 요청하는 경우 API KEY를 여기 환경 변수에 등록하고 사용하는 것이 좋음.
+예를 들자면, 이미지 호스팅 서비스를 이용하거나 날씨 API등을 사용할 때 API KEY는 환경변수에 등록하면 됨. 
+![](https://i.imgur.com/K25P7RY.png)
