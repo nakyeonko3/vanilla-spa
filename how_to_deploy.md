@@ -6,36 +6,38 @@
 - 일반적인 방법으로 owner권한이 없는 리포지토리를 배포할 수 있는 방법은 없기 때문에 복사한 리포를 배포하는 특이한 방법을 씀.
 - 백엔드 코드와 프론트엔드 코드를 분리 할 필요가 없음. 같은 리포지토리 안에 넣어서 배포하면됨.
 
+
+## 준비물
+
+- spa로 작성된 토이프로젝트 인트라넷 웹앱
+- Gihub Repository 2개가 필요함. `베포 리포`와 `개발 리포`  두개. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
+- `배포 리포지토리`는 팀 organization을 하나 더 만들고 그걸 쓰는 걸 추천드림.
+- 깃허브 인증 토큰.(인증 토큰 발급 방법은 아래서 설명함.)
+
+
 ## 유의 사항
 
 - 아래서 설명할 때 `개용 리포지토리`와 `배포 리포지토리`라는 용어를 쓸 것임.
-- `개발 리포지토리`는 우리가 편집하는 코드가 저장되는 리포지토리임. owner 권한이 없어도 됨.
-- `배포 리포지토리`는 말그대로 배포용도로만 쓰는 리포지토리임. owner권한이 있어야함.
-
-- 개발용 리포 주소
-  [GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
-
-- 배포용 리포
-  [GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
-
-- 이런식으로 두개의 리포가 있어햐함. 이번 토이프로젝트 때 팀2도 이런식으로 리포지토리를 2개 만들었습니다.
+- `개발 리포지토리(개발 리포)`는 우리가 편집하는 코드가 저장되는 리포지토리임. owner 권한이 없어도 됨.
+- `배포 리포지토리(배포 리포)`는 말그대로 배포용도로만 쓰는 리포지토리임. owner권한이 있어야함.
+- 이런식으로 두개의 리포가 필요함. 이번 토이프로젝트 때 팀2도 이런식으로 리포지토리를 2개 만들었습니다.
 ![](https://i.imgur.com/LxaEnXC.png)
 
 - **작성할 스크립트를 작성 할 때는 오타나 띄어 쓰기를 유의해서 작성해야함.**
 - 스크립트를 그대로 복사해서 쓰는 것이 아니라 배포하려는 리포지토리와 깃허브 유저네임 등에 맞게 **수정한 다음 사용해야함.**
 
-## 준비물
-
-- spa로 작성된 토이프로젝트 인트라넷 웹앱
-- Gihub Repository 2개가 필요함. `베포용`과 `개발용` 리포 두개. ( owner 권한이 있는 리포지토리와 owner 권한이 없는 팀 organization 리포지토리)
-- `배포 리포지토리`는 팀 organization을 하나 더 만들고 그걸  쓰는 걸 추천드림.
-- 깃허브 인증 토큰.(인증 토큰 발급 방법도 설명함.)
-- 저희 조도 마찬가지로 요런식으로 리포지토리를 두개 사용중입니다.
-
 
 ## 지금 리포지토리는 참고용으로 쓰시면 됩니다.
 
 이 리포지토리는 배포를 설명하기 위한 프로젝트입니다.
+마찬가지로 이 프로젝트 도 개발
+
+- 개발 리포 주소
+  [GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
+
+- 배포 리포
+  [GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
+
 
 - 폴더 구조도
 
@@ -66,6 +68,13 @@ vanilla-spa
          └─ home.js
 
 ```
+
+목차
+ 1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
+ 2. 배포 환경 미리 테스트 해보기
+ 3. Github action 설정해서 `개발용 리포`와 `배포용 리포`를 동기화 시키기
+ 4.  `배포용 리포지토리`를 웹 배포 서비스 사이트에 등록하기
+
 
 ## 1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
 
