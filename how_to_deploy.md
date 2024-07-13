@@ -342,9 +342,7 @@ jobs:
 
 ## 4. `배포용 리포지토리`를 웹 배포 서비스 사이트에 등록하기
 
-
-### render 서비스를 이용해서 배포하기
-
+- render 서비스를 이용해서 배포하기
 - Render 배포 서비스 사이트 링크 </br>
 [Cloud Application Hosting for Developers | Render](https://render.com/)
 
