@@ -75,44 +75,7 @@ vanilla-spa
  4.  `배포용 리포지토리`를 웹 배포 서비스 사이트에 등록하기
 
 
-## 1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
-
-### `express.static('dist')`를 사용하는 이유
-- 정적 파일들(Javascript, HTML, CSS, 등)을 서버가 제공하기 위해서임.
-- 사용자가 정적 파일을 요청하는 URL을 입력했을 때, 서버는 해당 파일을 `dist` 디렉토리에서 찾아서 사용자의 브라우저로 전송한다.
-- `/index.html` URL주소를 요청해도 서버에서는 `dist/index.html` 로 매핑해서 처리하는 것임. 
-- 예를 들어 , `/index.html`, `/styles.css`, `/main.js` 주소를 요청하면 `dist` 디렉토리에 있는 해당 파일을 사용자의 브라우저로 전송한다.
-- 우리의 SPA가 들어 있는 index.html를 사용자의 브라우저 화면으로 보내기 위해서는 꼭 필요하다.
-- [참고 Serving static files in Express](https://expressjs.com/en/starter/static-files.html)
-
-- 만약 사용자가 `/`위치 URL을 요청한다면 이 `dist`디렉토리에 있는 `index.html` 사용자의 브라우저로 전송하고,index.html에 포함된 JavaScript, CSS, 등을 통해 우리가 제작한 웹사이트를 브라우저가 화면을 그려주게 될 것이다.
-![](https://i.imgur.com/kRtKcD9.png)
-
-- 문제는 이것만 사용해서는 SPA앱이 제대로 동작하지 않는다. `connect-history-api-fallback`도 사용해줘야 한다.
-
-### `connect-history-api-fallback` 을 사용하는 이유
-- SPA의 클라이언트측 라우팅이 동작하기 위해서 설치함.
-- 로컬에서는 SPA웹앱을 접속할 때 SPA의 클라이언트측 라우터가 잘 라우팅을 해주지만, 배포 환경에서는 잘 동작하지 않을 가능성이 높다. 그 이유는 다음과 같다.
-- 루트 주소(`/`)로 사용자가 접속하고 다른 주소로 이동하는 것은 문제가 없지만 처음 사용자가 루트 주소가 아닌 `/employee-list` ,`/show-inofo`같은 주소를 처음에 들어 오게 되면 해당 루트 주소로 서버에 요청을 보내게 되는데 해당 주소는 서버에는 등록이 되어 있지 않다. 
-- 해당 주소들에 대한 처리는 클라이언트측 라우터가 처리를 해야하는데 다른 루트 주소로 접속하면 해당 클라이언트측 라우터가 먼저 동작하지 않고, 서버에 먼저 요청이 가게 된다.
-- 제대로 동작하기 위해서는 서버가 클라이언트 라우터가 처리해야 하는 주소를 클라이언트측 라우터로 전달시키고, 클라이언트측 라우터가 해당 주소를 처리하도록 해야한다. 
-- `connect-history-api-fallback`은 서버에 정의 되지 않은 주소들(클라이언트측 라우터가 처리하는 주소들)들을 전부다 서버가  `index.html` 을 응답으로 제공하게 된다.
-- 이렇게 하면 `/employee-list`라는 주소로 처음 접속해도, 서버는  `index.html`를 응답으로 제공하고, 해당 `index.html` 안에는 클라이언트측 라우터가 `/employee-list` 주소를 대신 처리하게 된다. 
-- 결론적으로는  `connect-history-api-fallback`를 사용해서 클라이언트측 라우터가 처리하는 주소들은 클라이언트측 라우터가 처리하도록 하기 위함이다.
-- [참고 connect-history-api-fallback - npm](https://www.npmjs.com/package/connect-history-api-fallback)
-
-- 아래 사진은 express 서버를 nodemon으로 실행된 후 터미널에 뜬 메시지들이다. `/gallery` 로 요청된 주소를 `/index.html`로 바꿔서 처리하는 것을 알 수 있다.
-![](https://i.imgur.com/BMafXE2.png)
-
-
-- 이렇게 하면 `/gallery` 주소로 요청을 보내도 서버는 `index.html`을 사용자의 브라우저로 전송하고 `index.html`안에 있는 JavaScript로 작성된 클라이언트측 라우터가 동작해서 `/gallery`주소로 라우팅을 해주고 갤러리 화면을 사용자의 웹화면에 보여준다.
-
-```bash
-Rewriting GET /gallery to /index.html
-GET /gallery 200 10.625 ms - 1626
-```
-
-- 근데 보통은 사용자가 로그인을 하지 않았다면 `/gallery`를 사용자가 입력해도 클라이언트 라우터가 갤러리 화면을 보여주지 않고 클라이언트측 라우터가 해당 라우팅 주소를 `/`또는 `/login`으로 바꾸고 로그인 화면이 뜨게 하는 것이 일반적이긴하다.
+## 1. `connect-history-api-fallback`, express.static('dist`)을 넣어 서버 코드 수정하기
 
 ### `connect-history-api-fallback` 종속성을 추가하고, 서버 코드 수정하기
 
@@ -175,6 +138,50 @@ app.get('/api/employees/:id', (req, res) => {
 ```
 
 서버에 오는 모든 API 요청을 전부다 정적 파일을 전달하는 주소`/index.html`로 바뀌어 버리기 때문에 위의 코드에서 `/api` 경로로 오는 서버 요청은 바뀌게 하지 않도록 설정을 해두었음.
+
+
+### `express.static('dist')`를 사용하는 이유
+- 정적 파일들(Javascript, HTML, CSS, 등)을 서버가 제공하기 위해서임.
+- 사용자가 정적 파일을 요청하는 URL을 입력했을 때, 서버는 해당 파일을 `dist` 디렉토리에서 찾아서 사용자의 브라우저로 전송한다.
+- `/index.html` URL주소를 요청해도 서버에서는 `dist/index.html` 로 매핑해서 처리하는 것임. 
+- 예를 들어 , `/index.html`, `/styles.css`, `/main.js` 주소를 요청하면 `dist` 디렉토리에 있는 해당 파일을 사용자의 브라우저로 전송한다.
+- 우리의 SPA가 들어 있는 index.html를 사용자의 브라우저 화면으로 보내기 위해서는 꼭 필요하다.
+- [참고 Serving static files in Express](https://expressjs.com/en/starter/static-files.html)
+
+
+- 만약 사용자가 `/`위치 URL을 요청한다면 이 `dist`디렉토리에 있는 `index.html` 사용자의 브라우저로 전송하고,index.html에 포함된 JavaScript, CSS, 등을 통해 우리가 제작한 웹사이트를 브라우저가 화면을 그려주게 될 것이다.
+![](https://i.imgur.com/kRtKcD9.png)
+
+- 문제는 이것만 사용해서는 SPA앱이 제대로 동작하지 않는다. `connect-history-api-fallback`도 사용해줘야 한다.
+
+### `connect-history-api-fallback` 을 사용하는 이유
+- SPA의 클라이언트측 라우팅이 동작하기 위해서 설치함.
+- 로컬에서는 SPA웹앱을 접속할 때 SPA의 클라이언트측 라우터가 잘 라우팅을 해주지만, 배포 환경에서는 잘 동작하지 않을 가능성이 높다. 그 이유는 다음과 같다.
+- 루트 주소(`/`)로 사용자가 접속하고 다른 주소로 이동하는 것은 문제가 없지만 처음 사용자가 루트 주소가 아닌 `/employee-list` ,`/show-inofo`같은 주소를 처음에 들어 오게 되면 해당 루트 주소로 서버에 요청을 보내게 되는데 해당 주소는 서버에는 등록이 되어 있지 않다. 
+- 해당 주소들에 대한 처리는 클라이언트측 라우터가 처리를 해야하는데 다른 루트 주소로 접속하면 해당 클라이언트측 라우터가 먼저 동작하지 않고, 서버에 먼저 요청이 가게 된다.
+- 제대로 동작하기 위해서는 서버가 클라이언트 라우터가 처리해야 하는 주소를 클라이언트측 라우터로 전달시키고, 클라이언트측 라우터가 해당 주소를 처리하도록 해야한다. 
+- `connect-history-api-fallback`은 서버에 정의 되지 않은 주소들(클라이언트측 라우터가 처리하는 주소들)들을 전부다 서버가  `index.html` 을 응답으로 제공하게 된다.
+- 이렇게 하면 `/employee-list`라는 주소로 처음 접속해도, 서버는  `index.html`를 응답으로 제공하고, 해당 `index.html` 안에는 클라이언트측 라우터가 `/employee-list` 주소를 대신 처리하게 된다. 
+- 결론적으로는  `connect-history-api-fallback`를 사용해서 클라이언트측 라우터가 처리하는 주소들은 클라이언트측 라우터가 처리하도록 하기 위함이다.
+- [참고 connect-history-api-fallback - npm](https://www.npmjs.com/package/connect-history-api-fallback)
+- [참고 Serving a SPA with Express Server Router - DEV Community](https://dev.to/iamscottcab/serving-a-spa-with-express-server-router-552n)
+
+- 아래 사진은 express 서버를 nodemon으로 실행된 후 터미널에 뜬 메시지들이다. `/gallery` 로 요청된 주소를 `/index.html`로 바꿔서 처리하는 것을 알 수 있다.
+![](https://i.imgur.com/BMafXE2.png)
+
+
+- 이렇게 하면 `/gallery` 주소로 요청을 보내도 서버는 `index.html`을 사용자의 브라우저로 전송하고 `index.html`안에 있는 JavaScript로 작성된 클라이언트측 라우터가 동작해서 `/gallery`주소로 라우팅을 해주고 갤러리 화면을 사용자의 웹화면에 보여준다.
+
+```bash
+Rewriting GET /gallery to /index.html
+GET /gallery 200 10.625 ms - 1626
+```
+
+- 근데 보통은 사용자가 로그인을 하지 않았다면 `/gallery`를 사용자가 입력해도 클라이언트 라우터가 갤러리 화면을 보여주지 않고 클라이언트측 라우터가 해당 라우팅 주소를 `/`또는 `/login`으로 바꾸고 로그인 화면이 뜨게 하는 것이 일반적이긴하다.
+
+
+
+
 
 ## 2. 배포 환경 미리 테스트 해보기
 
@@ -335,13 +342,20 @@ jobs:
 
 ## 4. `배포용 리포지토리`를 웹 배포 서비스 사이트에 등록하기
 
+
+### render 서비스를 이용해서 배포하기
+
+- Render 배포 서비스 사이트 링크 </br>
+[Cloud Application Hosting for Developers | Render](https://render.com/)
+
 일단은 render가 무료고 추가 비용청구가 될 일이 없어서 render를 쓸 것임.
 다만, 콜드 스타트 이슈 때문에 가능하면 다른 배포 사이트를 사용하는 것도 좋음.
 render 대신에 koyeb나 railway를 배포해도 괜찮음. 배포 방법은 동일함.
 vercel은 안됨.
 
 이 링크를 참고해서 이 중에 하나를 고르면 됨.
-https://github.com/DmitryScaletta/free-heroku-alternatives?tab=readme-ov-file
+[GitHub - DmitryScaletta/free-heroku-alternatives: Comparison of free Heroku alternatives for backend applications](https://github.com/DmitryScaletta/free-heroku-alternatives?tab=readme-ov-file)
+
 
 ### render 에 배포 리포지토리를 등록하기
 render 가입하는 방법은 생략함.
@@ -371,6 +385,27 @@ deploy web service를 누르면 끝
 
 이제는 `개발 리포`에서 main에 커밋을 할 때 변경한 사항이 배포 사이트에서 해당 변경 내역에 대한 것을 반영하고 재빌드하게 될 것임.
 ![](https://i.imgur.com/b5a6vuU.png)
+
+## 배포가 안될 때 문제 해결 팁
+
+1. 위의 내용대로 따라했는데 안되는 이유는 build.sh나 github action이 적혀있는 yml 파일에 오타가 있거나 리포지토리명이나 유저명을 제대로 넣어서 작성하지 않았을 가능성이 높음.</br> 아래 사진 처럼 띄어쓰기 하나라도 잘못 되어 있으면 오류가 발생할 것임.
+![](https://i.imgur.com/A9o6lgg.png)
+
+2. pacakage.json에 제대로 npm run start 명령어가 명시되어 있어야함.
+![](https://i.imgur.com/TOTAtvg.png)
+
+3. 처음 웹화면 속도가 너무 느림
+render 서비스는 콜드 스타트 옵션 때문에 사용자가 해당 웹서비스를 이용하지 않으면 해당 서버를 render 서비스가 서버를 아예 종료시켰다가 사용자가 서비스를 사용하기 위해 해당 웹사이트 주소를 입력하면 그때서야 서버가 다시 켜지게된다.
+
+그래서 다른 웹 서비스를 이용해서 배포하는 것을 추천함. 
+아래 링크의 글을 참고해서 배포 서비스를 결정하기를 바람.
+https://github.com/DmitryScaletta/free-heroku-alternatives
+
+- koyeb
+[Koyeb: Push code to production, everywhere, in minutes](https://www.koyeb.com/)
+
+- railway
+[Railway](https://railway.app/)
 
 ### 선택) 환경 변수 등록
 외부 API를 요청하는 경우 API KEY를 여기 환경 변수에 등록하고 사용하는 것이 좋음.
