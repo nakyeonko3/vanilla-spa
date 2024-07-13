@@ -241,8 +241,8 @@ container.innerHTML = /* HTML */ `
 
 
 
-## 유저 깃허브 인증 토큰 발급하기
-
+### 유저 깃허브 인증 토큰 발급하기
+---
 - 깃허브 홈화면 -> settings -> Developer settings 로 차례로 이동
   ![](https://i.imgur.com/7Lq0bbP.png)
   ![](https://i.imgur.com/ngX5NA9.png)
