@@ -141,12 +141,6 @@ app.use(
           return context.parsedUrl.pathname;
         },
       },
-      {
-        from: /^\/dist\/.*$/,
-        to: function (context) {
-          return context.parsedUrl.pathname;
-        },
-      },
     ],
   }),
 );
