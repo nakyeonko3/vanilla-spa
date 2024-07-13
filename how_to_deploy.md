@@ -17,7 +17,7 @@
 
 ## 유의 사항
 
-- 아래서 설명할 때 `개용 리포지토리`와 `배포 리포지토리`라는 용어를 쓸 것임.
+- 아래서 설명할 때 `개발 리포지토리`와 `배포 리포지토리`라는 용어를 쓸 것임.
 - `개발 리포지토리(개발 리포)`는 우리가 편집하는 코드가 저장되는 리포지토리임. owner 권한이 없어도 됨.
 - `배포 리포지토리(배포 리포)`는 말그대로 배포용도로만 쓰는 리포지토리임. owner권한이 있어야함.
 - 이런식으로 두개의 리포가 필요함. 이번 토이프로젝트 때 팀2도 이런식으로 리포지토리를 2개 만들었습니다.
@@ -75,6 +75,45 @@ vanilla-spa
 
 
 ## 1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
+
+### `express.static('dist')`를 사용하는 이유
+- 정적 파일들(Javascript, HTML, CSS, 등)을 서버가 제공하기 위해서임.
+- 사용자가 정적 파일을 요청하는 URL을 입력했을 때, 서버는 해당 파일을 `dist` 디렉토리에서 찾아서 사용자의 브라우저로 전송한다.
+- `/index.html` URL주소를 요청해도 서버에서는 `dist/index.html` 로 매핑해서 처리하는 것임. 
+- 예를 들어 , `/index.html`, `/styles.css`, `/main.js` 주소를 요청하면 `dist` 디렉토리에 있는 해당 파일을 사용자의 브라우저로 전송한다.
+- 우리의 SPA가 들어 있는 index.html를 사용자의 브라우저 화면으로 보내기 위해서는 꼭 필요하다.
+- [참고 Serving static files in Express](https://expressjs.com/en/starter/static-files.html)
+
+- 만약 사용자가 `/`위치 URL을 요청한다면 이 `dist`디렉토리에 있는 `index.html` 사용자의 브라우저로 전송하고,index.html에 포함된 JavaScript, CSS, 등을 통해 우리가 제작한 웹사이트를 브라우저가 화면을 그려주게 될 것이다.
+![](https://i.imgur.com/kRtKcD9.png)
+
+- 문제는 이것만 사용해서는 SPA앱이 제대로 동작하지 않는다. `connect-history-api-fallback`도 사용해줘야 한다.
+
+### `connect-history-api-fallback` 을 사용하는 이유
+- SPA의 클라이언트측 라우팅이 동작하기 위해서 설치함.
+- 로컬에서는 SPA웹앱을 접속할 때 SPA의 클라이언트측 라우터가 잘 라우팅을 해주지만, 배포 환경에서는 잘 동작하지 않을 가능성이 높다. 그 이유는 다음과 같다.
+- 루트 주소(`/`)로 사용자가 접속하고 다른 주소로 이동하는 것은 문제가 없지만 처음 사용자가 루트 주소가 아닌 `/employee-list` ,`/show-inofo`같은 주소를 처음에 들어 오게 되면 해당 루트 주소로 서버에 요청을 보내게 되는데 해당 주소는 서버에는 등록이 되어 있지 않다. 
+- 해당 주소들에 대한 처리는 클라이언트측 라우터가 처리를 해야하는데 다른 루트 주소로 접속하면 해당 클라이언트측 라우터가 먼저 동작하지 않고, 서버에 먼저 요청이 가게 된다.
+- 제대로 동작하기 위해서는 서버가 클라이언트 라우터가 처리해야 하는 주소를 클라이언트측 라우터로 전달시키고, 클라이언트측 라우터가 해당 주소를 처리하도록 해야한다. 
+- `connect-history-api-fallback`은 서버에 정의 되지 않은 주소들(클라이언트측 라우터가 처리하는 주소들)들을 전부다 서버가  `index.html` 을 응답으로 제공하게 된다.
+- 이렇게 하면 `/employee-list`라는 주소로 처음 접속해도, 서버는  `index.html`를 응답으로 제공하고, 해당 `index.html` 안에는 클라이언트측 라우터가 `/employee-list` 주소를 대신 처리하게 된다. 
+- 결론적으로는  `connect-history-api-fallback`를 사용해서 클라이언트측 라우터가 처리하는 주소들은 클라이언트측 라우터가 처리하도록 하기 위함이다.
+- [참고 connect-history-api-fallback - npm](https://www.npmjs.com/package/connect-history-api-fallback)
+
+- 아래 사진은 express 서버를 nodemon으로 실행된 후 터미널에 뜬 메시지들이다. `/gallery` 로 요청된 주소를 `/index.html`로 바꿔서 처리하는 것을 알 수 있다.
+![](https://i.imgur.com/BMafXE2.png)
+
+
+- 이렇게 하면 `/gallery` 주소로 요청을 보내도 서버는 `index.html`을 사용자의 브라우저로 전송하고 `index.html`안에 있는 JavaScript로 작성된 클라이언트측 라우터가 동작해서 `/gallery`주소로 라우팅을 해주고 갤러리 화면을 사용자의 웹화면에 보여준다.
+
+```bash
+Rewriting GET /gallery to /index.html
+GET /gallery 200 10.625 ms - 1626
+```
+
+- 근데 보통은 사용자가 로그인을 하지 않았다면 `/gallery`를 사용자가 입력해도 클라이언트 라우터가 갤러리 화면을 보여주지 않고 클라이언트측 라우터가 해당 라우팅 주소를 `/`또는 `/login`으로 바꾸고 로그인 화면이 뜨게 하는 것이 일반적이긴하다.
+
+### `connect-history-api-fallback` 종속성을 추가하고, 서버 코드 수정하기
 
 현재 프로젝트에`connect-history-api-fallback npm`종속성을 설치해준다.
 
@@ -144,6 +183,8 @@ app.get('/api/employees/:id', (req, res) => {
 
 ## 2. 배포 환경 미리 테스트 해보기
 
+
+### 빌드 명령어와 서버 실행 명령어 테스트 해보기
 로컬에서는 잘동작하다가 배포 환경에서는 가끔씩 이미지가 안나온다거나 로직이 문제가 생기는 경우가 빈번히 생김.
 
 이를 예방하기 위해서 먼저 배포 환경에서 작동될 명령어들을 실행해보면서 테스트 해봐야함
@@ -154,16 +195,17 @@ app.get('/api/employees/:id', (req, res) => {
 npm run build // vite 빌드
 npm run start // express 서버 실행
 ```
-
 ![](https://i.imgur.com/oQoHOvX.png)
 
-가끔씩 이미지가 dist에 안들어가게 되는 경우가 존재하니까 꼭 확인해봐야됨.
+### vite 빌드 결과물에 이미지가 누락되는지 확인하기 
 
-vite가 빌드할 때 dist 폴더 안에 이미지를 안 넣을 때가 있음.
-안들어간 것들은 보통 자바스크립트 innerHTML로 src를 명시해준 것들임 아래 vite 공식문서를 보고 어떻게 vite가 빌드를 하는지 확인해보고.
-이렇게 수정해불 필요가 있음.
+- vite 빌드 후에 가끔씩 이미지가 dist에 안들어가게 되는 경우가 존재하니까 꼭 확인해봐야됨.
+- vite는 빌드과정에서 JavaScript 코드를 이용해서 넣은 이미지들 중에서는 import 문을 통해 명시적으로 참조된 이미지들만 최종 빌드 결과물에 포함시킴.
+-  JavaScript에서 또는 `new URL`를 이용해서 명시한 이미지도 빌드 결과물에 포함을 시킴. 근데 이 부분은 동적으로 이미지 new URL를 만들면 안되는 경우가 있어서 유의해야함, 자세한건 [Vite 가 정적 파일을 처리하는 방법 vite 공식문서](https://vitejs.dev/guide/assets) 를 보는게 좋음) 
+- vite가 html, css에서 Link태그나 url() 속성을 이용해서 넣은 이미지들은빌드 최종결과물에 포함시키니 문제가 없음.
+- 그래서 이렇게 수정해불 필요가 있음.
 
-[Vite 가 정적 파일을 처리하는 방법 vite 공식문서](https://vitejs.dev/guide/assets)
+
 
 아래 코드처럼 작성하면 `avatar-default.jpg` 이미지가 잘 나올 것임.
 
@@ -250,9 +292,10 @@ cp -R ./output ./[team-repo-name]/
 아래`destination-github-username`과 `destination-repository-name`를 편집하고 등록하면 된다.
 현재 리포가 배포 레포지토리 소유자의 username과 repo 이름을 적어준다.
 소유자가 자기 자신이면 username을 넣으면 된다. repo에는 말그대로 배포용 리포지토리 이름을 넣어 주면 된다.
+이렇게 작성하고 commit 버튼을 누르거나 `.github/workfows/main.yml`여기에 저장하면 된다.
 
 ```yaml
-name: git push into another repo to deploy to vercel
+name: git push into another repo to deploy repo
 
 on:
   push:
