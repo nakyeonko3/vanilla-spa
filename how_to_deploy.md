@@ -30,13 +30,10 @@
 ## 지금 리포지토리는 참고용으로 쓰시면 됩니다.
 
 이 리포지토리는 배포를 설명하기 위한 프로젝트입니다.
-마찬가지로 이 프로젝트 도 개발
+마찬가지로 이 프로젝트 도 개발 리포, 배포 리포 두개를 만들었음.
 
-- 개발 리포 주소
-  [GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
-
-- 배포 리포
-  [GitHub - nakyeonko3/vanila-spa-deploy-no-owner: SPA앱 베포용 리포지토리입니다](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
+- [GitHub - nakyeonko3/vanilla-spa: 개발 리포지토리](https://github.com/nakyeonko3/vanilla-spa)
+- [GitHub - nakyeonko3/vanila-spa-deploy-no-owner: 배포 리포지토리](https://github.com/nakyeonko3/vanila-spa-deploy-no-owner)
 
 
 - 폴더 구조도
