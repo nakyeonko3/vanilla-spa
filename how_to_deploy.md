@@ -156,7 +156,44 @@ app.get('/api/employees/:id', (req, res) => {
 - 문제는 이것만 사용해서는 SPA앱이 제대로 동작하지 않는다. `connect-history-api-fallback`도 사용해줘야 한다.
 
 ### `connect-history-api-fallback` 을 사용하는 이유
-- SPA의 클라이언트측 라우팅이 동작하기 위해서 설치함.
+- SPA의 클라이언트측 라우터가 제대로 동작하기 위해서 설치함.
+- 클라이언트 라우터는 리액트앱이라면 [react-router-dom](https://reactrouter.com/en/main)을 사용할 수 있고,
+vanila로 작성된 JavaScrit코드라면 [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)를 작성해볼 수도 있다. 또는 [라이브러리 없이 라우터(Router) 만들기 | 카카오엔터테인먼트 FE 기술블로그](https://fe-developers.kakaoent.com/2022/221124-router-without-library/) 에서 나온 것처럼 Fragment 해시를 이용해서 클라이언트측에서 작동하는 라우터를 만들어 볼 수 있다.
+-  아래는 클라이언트측 라우터 예시 코드이다. 아래의 코드에서는 `/`, `/about`, `/contact`등 주소를 라우팅한다.
+
+[GitHub - zathio/vanilla-spa: Basic spa with vanilla js](https://github.com/zathio/vanilla-spa) 
+```js
+const routes = {
+    "/": { title: "Home", render: home },
+    "/about": { title: "About", render: about },
+    "/contact": { title: "Contact", render: contact },
+};
+
+function router() {
+    let view = routes[location.pathname];
+
+    if (view) {
+        document.title = view.title;
+        app.innerHTML = view.render();
+    } else {
+        history.replaceState("", "", "/");
+        router();
+    }
+};
+
+// Handle navigation
+window.addEventListener("click", e => {
+    if (e.target.matches("[data-link]")) {
+        e.preventDefault();
+        history.pushState("", "", e.target.href);
+        router();
+    }
+});
+
+```
+
+
+
 - 로컬에서는 SPA웹앱을 접속할 때 SPA의 클라이언트측 라우터가 잘 라우팅을 해주지만, 배포 환경에서는 잘 동작하지 않을 가능성이 높다. 그 이유는 다음과 같다.
 - 루트 주소(`/`)로 사용자가 접속하고 다른 주소로 이동하는 것은 문제가 없지만 처음 사용자가 루트 주소가 아닌 `/employee-list` ,`/show-inofo`같은 주소를 처음에 들어 오게 되면 해당 루트 주소로 서버에 요청을 보내게 되는데 해당 주소는 서버에는 등록이 되어 있지 않다. 
 - 해당 주소들에 대한 처리는 클라이언트측 라우터가 처리를 해야하는데 다른 루트 주소로 접속하면 해당 클라이언트측 라우터가 먼저 동작하지 않고, 서버에 먼저 요청이 가게 된다.
@@ -410,3 +447,8 @@ https://github.com/DmitryScaletta/free-heroku-alternatives
 외부 API를 요청하는 경우 API KEY를 여기 환경 변수에 등록하고 사용하는 것이 좋음.
 예를 들자면, 이미지 호스팅 서비스를 이용하거나 날씨 API등을 사용할 때 API KEY는 환경변수에 등록하면 됨. 
 ![](https://i.imgur.com/K25P7RY.png)
+
+
+## 참고 자료
+
+[GitHub Organization 프로젝트를 vercel 무료로 연동하기 (+git actions)](https://velog.io/@rmaomina/organization-vercel-hobby-deploy)
