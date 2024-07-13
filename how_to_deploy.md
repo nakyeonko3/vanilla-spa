@@ -66,7 +66,8 @@ vanilla-spa
 
 ```
 
-목차
+## 목차
+이 4단계로 차례로 설명하겠음.
  1. `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
  2. 배포 환경 미리 테스트 해보기
  3. Github action 설정해서 `개발용 리포`와 `배포용 리포`를 동기화 시키기
