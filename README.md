@@ -2,7 +2,12 @@
 
 - 일단 어떻게 배포를 했는지 how to 위주로 정리함.
 - 현재 리포지토리를 다른 리포지토리로 연결해서 배포하도록 설정해두었으니 이 프로젝트 코드를 참고해도됨.
+- 아래의 설명에서 `개발용 리포`와 `배포용 리포` 두가지 용어를 사용할 것임. 유의해서 읽기를 바람.
 - 개발용이 우리가 편집하는 코드가 저장되는 리포지토리고, 배포용이 말그대로 배포용도로만 쓰는 리포지토리임.
+
+- 용어 설명
+   - `개발 리포(개발 리포지토리)`: 개발자들이 코드를 수정하고 적는 리포지토리, 깃헙 리포지토리 owner권한이 없어도됨.
+   - `배포 리포(배포 리포지토리)`: 개발 리포의 내용을 복사해서 저장만할 리포지토리임, 배포 호스팅 사이트에 등록할 리포지토리
 
 - 개발용 리포 주소
 [GitHub - nakyeonko3/vanilla-spa: 개발용 리포지토리.](https://github.com/nakyeonko3/vanilla-spa)
@@ -19,8 +24,9 @@
 - 깃허브 인증 토큰.(인증 토큰 발급 방법도 설명함.)
 
 
-## 지금 리포지토리는 참고용으로 쓰시면 됩니다. 
-배포를 설명하기 위해서 다시 한번 배포를 예시 프로젝트를 만들었음.
+**지금 보고 계시는 이 리포지토리는 배포하실 때 참고용으로 쓰시면 됩니다**
+배포를 설명하기 위해서 제가 한 번 더 배포를 진행해보았습니다. 
+이 리포지토리는 **예시 프로젝트**라고 생각하면되요.
 
 - 폴더 구조도
 ```
@@ -51,7 +57,10 @@ vanilla-spa
 
 ```
 
-## `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
+## 1. 배포에 정합하도록 프로젝트 코드(서버 코드, 프론트엔드코드) 설정하고 수정하기
+- express설정들과 vite build 될 때의 정적 파일들이 어떻게 생성되는지 확인을 해보는 작업임.
+
+### `connect-history-api-fallback` 종속성 설치하고, express 서버 코드 수정하기
 
 현재 프로젝트에` connect-history-api-fallback npm `종속성을 설치해준다.
 ```js
@@ -118,7 +127,7 @@ app.get('/api/employees/:id', (req, res) => {
 
 서버에 오는 모든 API 요청을 전부다 정적 파일을 전달하는 주소`/index.html`로 바뀌어 버리기 때문에 위의 코드에서 `/api` 경로로 오는 서버 요청은 바뀌게 하지 않도록 설정을 해두었음.
 
-## 배포 환경 미리 테스트 해보기
+### 배포 환경 미리 테스트 해보기
 
 로컬에서는 잘동작하다가 배포 환경에서는 가끔씩 이미지가 안나온다거나 로직이 문제가 생기는 경우가 빈번히 생김.
 
@@ -136,7 +145,7 @@ npm run start // express 서버 실행
 가끔씩 이미지가 dist에 안들어가게 되는 경우가 존재하니까 꼭 확인해봐야됨. 
 
 vite가 빌드할 때 dist 폴더 안에 이미지를 안 넣을 때가 있음.
-안들어간 것들은 보통 자바스크립트 innerHTML로 src를 명시해준 것들임 아래 vite 공식문서를 보고 어떻게 vite가 빌드를 하는지 확인해보고. 
+안들어간 것들은 보통 자바스크립트 innerHTML로 src를 명시해준 것들임 아래 vite 공식문서를 보고 어떻게 vite가 빌드를 하는지 확인해보고.( 이 참에 vite가 정적 파일을 어떻게 빌드하는지 확인도 해보는게 좋을 것 같다.)
 이렇게 수정해불 필요가 있음.
 
 [Vite 가 정적 파일을 처리하는 방법 vite 공식문서](https://vitejs.dev/guide/assets)
@@ -157,7 +166,7 @@ container.innerHTML = /* HTML */ `
 ```
 
 
-`avatar-default.jpg` 이미지가 로컬에서는 잘 나와도 배포 환경에서는 다깨져서 나올 가능성이 높음.
+`avatar-default.jpg` 이미지가 로컬에서는 잘 나와도 배포 환경에서는 not found image 에러가 뜨면서 웹화면에 다 깨져서 나올 가능성이 높음.
 ```js
 const container = querySelector("app");
 container.innerHTML = /* HTML */ `
@@ -179,20 +188,15 @@ container.innerHTML = /* HTML */ `
 ![](https://i.imgur.com/vAN8GdG.png)
 
 - 아래의 권한을 체크하고 토큰을 발급받고 , 토큰값을 복사해서 어딘가에 저장하면 토큰 발급 완료!
- ![](https://i.imgur.com/BC2296D.png)
+![](https://i.imgur.com/v6gCUoR.png)
 
 
-## Github action 설정하기 
-아래의 설정 파일을 일단 복사하기
-
+## 2. Github action 설정하기 
 
 
 ###  `build.sh` 파일 생성하기
 
-
-개발 리포의 루트 경로에 `build.sh` 를 생성해서 저장하기
-
-이걸 그대로 그대로 쓰면 안되고 현재 `[team-repo-name]`에 개발 리포지토리명을 적으면됨.
+`build.sh` 를 아래 스크립트 코드를 복사한 다음 프로젝트 폴더 루트 경로에 넣어준다.
 ```shell
 #!/bin/sh
 cd ../
@@ -200,8 +204,13 @@ mkdir output
 cp -R ./[team-repo-name]/* ./output
 cp -R ./output ./[team-repo-name]/
 ```
+![](https://i.imgur.com/TCW6C9t.png)
 
-요런식으로 적으면됨.
+`build.sh`를 이제 수정해서 다시 저장해 준다.
+ 현재 `[team-repo-name]`부분을 수정해서  `개발 리포지토리`의 이름을 적으면 된다.
+이걸 적을 때 띄어쓰기나 대문자 소문자를 잘 구분해서 적어야됨.
+
+만약에 현재 `개발 리포` 이름이 `vanil-spa`라면 아래와 같이 build.sh를 작성하면됨.
 ![](https://i.imgur.com/QksE49O.png)
 
 
@@ -225,12 +234,10 @@ cp -R ./output ./[team-repo-name]/
 ![](https://i.imgur.com/UR4Bo7k.png)
 
 
+아래`destination-github-username`과 `destination-repository-name`를 수정하고 등록하면 된다.
 
-
-아래`destination-github-username`과 `destination-repository-name`를 편집하고 등록하면 된다.
-  현재 리포가 배포 레포지토리 소유자의 username과 repo 이름을 적어준다.
-소유자가 자기 자신이면 username을 넣으면 된다. repo에는 말그대로 배포용 리포지토리 이름을 넣어 주면 된다.
-
+`destination-github-username`: 여기에는 깃허브 유저 네임을 적으면된다. 만약에 `배포 리포`가 `organization`에 등록된 리포지토리라면 `organization` 이름을 적어준다.  
+`destination-repository-name`: `배포 리포`의 이름을 적는다.
 ```yaml
 name: git push into another repo to deploy to vercel
 
@@ -263,7 +270,9 @@ jobs:
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
 ```
-![](https://i.imgur.com/6yqju4L.png)
+
+`배포 리포`의 이름이 `vanila-spa-deploy-no-owner`이고 깃허브 유저 이름이 `nakyeonko3`라면 아래처럼 적으면 된다.
+![](https://i.imgur.com/AMNB9ip.png)
 
 
 
